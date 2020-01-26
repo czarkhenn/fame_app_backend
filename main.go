@@ -5,20 +5,17 @@ import (
 	"log"
 	"net/http"
 	"fmt"
-	// "math/rand"
 	"strconv"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"io/ioutil"
 	"time"
-	// "github.com/rs/cors"
 )
 
 type Response struct {
     Message string `json:"message"`
 }
-
 
 // Models/Struct (Person)
 type Person struct {
@@ -32,8 +29,6 @@ type Person struct {
 	UpdatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
 }
 
-
-
 var db *gorm.DB
 var err error
 
@@ -45,14 +40,14 @@ func initDB() {
         fmt.Println(err)
         panic("failed to connect database")
     }
-
-	// db.Exec("CREATE DATABASE persons")
-	// db.Exec("USE persons")
+	
+		// initialize onlu once
+		// db.Exec("CREATE DATABASE persons")
+		// db.Exec("USE persons")
 	
     // Migration to create tables for Order and Item schema
     db.AutoMigrate(&Person{})
 }
-
 
 // respondJSON makes the response with payload as json format
 func respondJSON(w http.ResponseWriter, status int, payload interface{}) {
@@ -72,8 +67,6 @@ func respondJSON(w http.ResponseWriter, status int, payload interface{}) {
 func respondError(w http.ResponseWriter, code int, message string) {
 	respondJSON(w, code, map[string]string{"error": message})
 }
-
-
 
 // List all person
 func listPersons(w http.ResponseWriter, r *http.Request){
@@ -195,7 +188,6 @@ func updatePerson(w http.ResponseWriter, r *http.Request){
 		}
 	
 	}
-
 }
 
 // Delete a person
@@ -241,18 +233,12 @@ func deleteAllPerson(w http.ResponseWriter, r *http.Request){
 	var _persons []Person
 	db.Find(&_persons)
 	db.Delete(&_persons)
-	// var deleted = "Deleted Successfully"
-	// respondJSON(w, http.StatusOK, deleted)
 }
 
-
-
-
-
-
-
 func main () {
+	//Initialize Database
 	initDB()
+
 	// Router Initialize
 	r := mux.NewRouter()
 
@@ -265,6 +251,5 @@ func main () {
 	r.HandleFunc("/api/delete", deleteAllPerson).Methods("GET", "OPTIONS")
 
 	log.Fatal(http.ListenAndServe(":8000", r))
-	
 	
 }
