@@ -12,6 +12,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"io/ioutil"
 	"time"
+	// "github.com/rs/cors"
 )
 
 type Response struct {
@@ -62,6 +63,7 @@ func respondJSON(w http.ResponseWriter, status int, payload interface{}) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(status)
 	w.Write([]byte(response))
 }
@@ -75,6 +77,9 @@ func respondError(w http.ResponseWriter, code int, message string) {
 
 // List all person
 func listPersons(w http.ResponseWriter, r *http.Request){
+	w.Header().Set("Access-Control-Allow-Headers", "*")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 	db, err := gorm.Open("sqlite3", "persons.db")
 	if err != nil {
 	  panic("failed to connect database")
@@ -90,7 +95,9 @@ func listPersons(w http.ResponseWriter, r *http.Request){
 
 // Get a person
 func getPerson(w http.ResponseWriter, r *http.Request){
-	
+	w.Header().Set("Access-Control-Allow-Headers", "*")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 	db, err := gorm.Open("sqlite3", "persons.db")
 	if err != nil {
 	  panic("failed to connect database")
@@ -117,6 +124,9 @@ func getPerson(w http.ResponseWriter, r *http.Request){
 
 // Create a person
 func createPerson(w http.ResponseWriter, r *http.Request){
+	w.Header().Set("Access-Control-Allow-Headers", "*")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 	db, err := gorm.Open("sqlite3", "persons.db")
 	if err != nil {
 	  panic("failed to connect database")
@@ -141,6 +151,9 @@ func createPerson(w http.ResponseWriter, r *http.Request){
 
 // Edit a person
 func updatePerson(w http.ResponseWriter, r *http.Request){
+	w.Header().Set("Access-Control-Allow-Headers", "*")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 	db, err := gorm.Open("sqlite3", "persons.db")
 	if err != nil {
 	  panic("failed to connect database")
@@ -183,12 +196,13 @@ func updatePerson(w http.ResponseWriter, r *http.Request){
 	
 	}
 
-
-
 }
 
 // Delete a person
 func deletePerson(w http.ResponseWriter, r *http.Request){
+	w.Header().Set("Access-Control-Allow-Headers", "*")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 	db, err := gorm.Open("sqlite3", "persons.db")
 	if err != nil {
 	  panic("failed to connect database")
@@ -241,15 +255,15 @@ func main () {
 	initDB()
 	// Router Initialize
 	r := mux.NewRouter()
-	
+
 	// Endpoints
-	r.HandleFunc("/api/persons", listPersons).Methods("GET")
-	r.HandleFunc("/api/persons/{id}", getPerson).Methods("GET")
-	r.HandleFunc("/api/persons", createPerson).Methods("POST")
-	r.HandleFunc("/api/persons/{id}", updatePerson).Methods("PUT")
-	r.HandleFunc("/api/persons/{id}", deletePerson).Methods("DELETE")
-	r.HandleFunc("/api/delete", deleteAllPerson).Methods("GET")
-	
+	r.HandleFunc("/api/persons", listPersons).Methods("GET", "OPTIONS")
+	r.HandleFunc("/api/persons/{id}", getPerson).Methods("GET", "OPTIONS")
+	r.HandleFunc("/api/persons", createPerson).Methods("POST", "OPTIONS")
+	r.HandleFunc("/api/persons/{id}", updatePerson).Methods("PUT", "OPTIONS")
+	r.HandleFunc("/api/persons/{id}", deletePerson).Methods("DELETE", "OPTIONS")
+	r.HandleFunc("/api/delete", deleteAllPerson).Methods("GET", "OPTIONS")
+
 	log.Fatal(http.ListenAndServe(":8000", r))
 	
 	
